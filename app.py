@@ -91,5 +91,3 @@ else:
         ax.text(i, v + 0.02, f"{v*100:.1f}%", ha='center', fontweight='bold')
     st.pyplot(fig)
 
-else:
-    st.info("Please upload a fabric image to begin classification.")
