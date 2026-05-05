@@ -5,39 +5,8 @@ import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
 import cv2
-
 # ---------------------- #
-#  Model & Class Config  #
-# ---------------------- #
-MODEL_PATH = "model.h5"
-CLASS_NAMES = ["Blended", "Cotton"]
-
-@st.cache_resource
-def load_cotton_model():
-    model = load_model(MODEL_PATH)
-    return model
-
-model = load_cotton_model()
-
-# ---------------------- #
-#   Streamlit UI Setup   #
-# ---------------------- #
-st.set_page_config(page_title="Cotton vs Blended Classifier", page_icon="🧵", layout="centered")
-
-st.title("🧶 Cotton vs Blended Fabric Classifier")
-st.markdown("""
-This deep learning app uses a fine-tuned **MobileNet model** to classify textile fabrics as:
-- 👕 **Cotton**
-- 🧥 **Blended**
-
-Now enhanced with **Explainable AI (Grad-CAM)** to visualize *where* the model focuses while making predictions.
-""")
-
-# ---------------------- #
-#      Image Upload      #
-# ---------------------- #
-# ---------------------- #
-#   Image Input (NEW)    #
+#   Image Input          #
 # ---------------------- #
 
 st.markdown("### 📸 Upload or Capture Fabric Image")
@@ -68,24 +37,21 @@ elif uploaded_file is not None:
 # ---------------------- #
 
 if img is not None:
-    try:
-        st.image(img, caption="Selected Fabric Image", use_container_width=True)
+    st.image(img, caption="Selected Fabric Image", use_container_width=True)
 
-        img_array = preprocess_image(img)
+    img_array = preprocess_image(img)
+    predictions = model.predict(img_array)
+    predicted_index = np.argmax(predictions[0])
+    predicted_class = CLASS_NAMES[predicted_index]
+    confidence = np.max(predictions[0]) * 100
 
-        predictions = model.predict(img_array)
-        predicted_index = np.argmax(predictions[0])
-        predicted_class = CLASS_NAMES[predicted_index]
-        confidence = np.max(predictions[0]) * 100
+    st.subheader(f"🩺 Prediction: **{predicted_class}**")
+    st.write(f"Confidence: {confidence:.2f}%")
 
-        st.subheader(f"🩺 Prediction: **{predicted_class}**")
-        st.write(f"Confidence: {confidence:.2f}%")
-
-    except Exception as e:
-        st.error(f"Error processing image: {e}")
+    # (keep your Grad-CAM code here inside this block)
 
 else:
-    st.info("Please upload or capture an image to proceed.")  # ---------------------- #
+    st.info("Please upload or capture a fabric image to begin classification.")
     #  Explainable AI (Grad-CAM)
     # ---------------------- #
     import tensorflow as tf
