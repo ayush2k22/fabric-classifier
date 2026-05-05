@@ -68,16 +68,24 @@ elif uploaded_file is not None:
 # ---------------------- #
 
 if img is not None:
-    st.image(img, caption="Selected Fabric Image", use_container_width=True)
+    try:
+        st.image(img, caption="Selected Fabric Image", use_container_width=True)
 
-    img_array = preprocess_image(img)
-    predictions = model.predict(img_array)
-    predicted_index = np.argmax(predictions[0])
-    predicted_class = CLASS_NAMES[predicted_index]
-    confidence = np.max(predictions[0]) * 100
+        img_array = preprocess_image(img)
 
-    st.subheader(f"🩺 Prediction: **{predicted_class}**")
-    st.write(f"Confidence: {confidence:.2f}%")    # ---------------------- #
+        predictions = model.predict(img_array)
+        predicted_index = np.argmax(predictions[0])
+        predicted_class = CLASS_NAMES[predicted_index]
+        confidence = np.max(predictions[0]) * 100
+
+        st.subheader(f"🩺 Prediction: **{predicted_class}**")
+        st.write(f"Confidence: {confidence:.2f}%")
+
+    except Exception as e:
+        st.error(f"Error processing image: {e}")
+
+else:
+    st.info("Please upload or capture an image to proceed.")  # ---------------------- #
     #  Explainable AI (Grad-CAM)
     # ---------------------- #
     import tensorflow as tf
